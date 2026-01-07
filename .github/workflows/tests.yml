@@ -22,22 +22,20 @@ jobs:
         run: xcodebuild -version
 
       - name: List available simulators
-        run: xcrun simctl list devices available | head -30
+        run: xcrun simctl list devices available | grep -E "iPhone (14|15)" | head -10
 
-      - name: Build with Swift Package Manager
+      - name: Build Package
         working-directory: OnlineNotifier
         run: |
-          swift build \
-            -Xswiftc "-sdk" \
-            -Xswiftc "$(xcrun --sdk iphonesimulator --show-sdk-path)" \
-            -Xswiftc "-target" \
-            -Xswiftc "arm64-apple-ios17.0-simulator"
+          xcodebuild build \
+            -scheme OnlineNotifier \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -skipPackagePluginValidation
 
       - name: Run Tests
         working-directory: OnlineNotifier
         run: |
-          swift test \
-            -Xswiftc "-sdk" \
-            -Xswiftc "$(xcrun --sdk iphonesimulator --show-sdk-path)" \
-            -Xswiftc "-target" \
-            -Xswiftc "arm64-apple-ios17.0-simulator"
+          xcodebuild test \
+            -scheme OnlineNotifier \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -skipPackagePluginValidation
