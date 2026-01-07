@@ -8,17 +8,28 @@ protocol NotificationHandling: AnyObject {
     func checkAuthorizationStatus() async -> UNAuthorizationStatus
 }
 
+/// Protocol for notification center operations, enabling testability
+protocol NotificationCenterProtocol {
+    func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool
+    func notificationSettings() async -> UNNotificationSettings
+    func add(_ request: UNNotificationRequest) async throws
+}
+
+/// Make UNUserNotificationCenter conform to our protocol
+extension UNUserNotificationCenter: NotificationCenterProtocol {}
+
 /// Handles local notification requests and delivery.
 final class NotificationService: NotificationHandling {
 
     // MARK: - Properties
 
-    private let notificationCenter: UNUserNotificationCenter
+    private let notificationCenter: NotificationCenterProtocol
 
     // MARK: - Initialization
 
-    init(notificationCenter: UNUserNotificationCenter = .current()) {
-        self.notificationCenter = notificationCenter
+    init(notificationCenter: NotificationCenterProtocol? = nil) {
+        // Only access UNUserNotificationCenter.current() when not in test environment
+        self.notificationCenter = notificationCenter ?? UNUserNotificationCenter.current()
     }
 
     // MARK: - Public Methods
@@ -54,8 +65,10 @@ final class NotificationService: NotificationHandling {
             trigger: nil // Deliver immediately
         )
 
-        notificationCenter.add(request) { error in
-            if let error = error {
+        Task {
+            do {
+                try await notificationCenter.add(request)
+            } catch {
                 print("Failed to send notification: \(error.localizedDescription)")
             }
         }

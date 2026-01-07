@@ -1,28 +1,56 @@
 import XCTest
+import UserNotifications
 @testable import OnlineNotifier
 
-@MainActor
+/// Mock notification center for AppState tests
+private final class TestNotificationCenterMock: NotificationCenterProtocol {
+    var authorizationGranted: Bool = true
+
+    func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool {
+        return authorizationGranted
+    }
+
+    func notificationSettings() async -> UNNotificationSettings {
+        // This shouldn't be called in these tests, but we need a fallback
+        fatalError("notificationSettings not implemented in test mock")
+    }
+
+    func add(_ request: UNNotificationRequest) async throws {
+        // No-op for tests
+    }
+}
+
 final class AppStateTests: XCTestCase {
+
+    // Helper to create AppState with mock notification service
+    @MainActor
+    private func createTestAppState() -> AppState {
+        let mockNotificationCenter = TestNotificationCenterMock()
+        let notificationService = NotificationService(notificationCenter: mockNotificationCenter)
+        return AppState(notificationService: notificationService)
+    }
 
     // MARK: - Initial State Tests
 
+    @MainActor
     func testInitialStateIsNotMonitoring() {
         // Given
         UserDefaults.standard.set(false, forKey: "AppState.isMonitoringEnabled")
 
         // When
-        let appState = AppState()
+        let appState = createTestAppState()
 
         // Then
         XCTAssertFalse(appState.isMonitoringEnabled, "Initial state should be not monitoring")
     }
 
+    @MainActor
     func testRestoresPersistedMonitoringState() {
         // Given
         UserDefaults.standard.set(true, forKey: "AppState.isMonitoringEnabled")
 
         // When
-        let appState = AppState()
+        let appState = createTestAppState()
 
         // Then
         XCTAssertTrue(appState.isMonitoringEnabled, "Should restore persisted monitoring state")
@@ -33,10 +61,11 @@ final class AppStateTests: XCTestCase {
 
     // MARK: - Toggle Tests
 
+    @MainActor
     func testToggleFromOffTurnsOn() async {
         // Given
         UserDefaults.standard.set(false, forKey: "AppState.isMonitoringEnabled")
-        let appState = AppState()
+        let appState = createTestAppState()
         XCTAssertFalse(appState.isMonitoringEnabled)
 
         // When
@@ -49,9 +78,10 @@ final class AppStateTests: XCTestCase {
         await appState.disableMonitoring()
     }
 
+    @MainActor
     func testToggleFromOnTurnsOff() async {
         // Given
-        let appState = AppState()
+        let appState = createTestAppState()
         await appState.enableMonitoring()
         XCTAssertTrue(appState.isMonitoringEnabled)
 
@@ -64,10 +94,11 @@ final class AppStateTests: XCTestCase {
 
     // MARK: - Persistence Tests
 
+    @MainActor
     func testEnableMonitoringPersistsState() async {
         // Given
         UserDefaults.standard.set(false, forKey: "AppState.isMonitoringEnabled")
-        let appState = AppState()
+        let appState = createTestAppState()
 
         // When
         await appState.enableMonitoring()
@@ -80,9 +111,10 @@ final class AppStateTests: XCTestCase {
         await appState.disableMonitoring()
     }
 
+    @MainActor
     func testDisableMonitoringPersistsState() async {
         // Given
-        let appState = AppState()
+        let appState = createTestAppState()
         await appState.enableMonitoring()
 
         // When
@@ -95,9 +127,10 @@ final class AppStateTests: XCTestCase {
 
     // MARK: - Background/Foreground Tests
 
+    @MainActor
     func testHandleEnterBackgroundDoesNotCrash() async {
         // Given
-        let appState = AppState()
+        let appState = createTestAppState()
         await appState.enableMonitoring()
 
         // When/Then - should not crash
@@ -107,9 +140,10 @@ final class AppStateTests: XCTestCase {
         await appState.disableMonitoring()
     }
 
+    @MainActor
     func testHandleEnterForegroundDoesNotCrash() async {
         // Given
-        let appState = AppState()
+        let appState = createTestAppState()
         await appState.enableMonitoring()
 
         // When/Then - should not crash
@@ -119,9 +153,10 @@ final class AppStateTests: XCTestCase {
         await appState.disableMonitoring()
     }
 
+    @MainActor
     func testConnectivityCheckDoesNotCrash() async {
         // Given
-        let appState = AppState()
+        let appState = createTestAppState()
         await appState.enableMonitoring()
 
         // When/Then - should not crash
@@ -134,9 +169,10 @@ final class AppStateTests: XCTestCase {
     // MARK: - Cleanup
 
     override func tearDown() async throws {
-        // Clean up UserDefaults
-        UserDefaults.standard.removeObject(forKey: "AppState.isMonitoringEnabled")
-        UserDefaults.standard.removeObject(forKey: "ConnectivityMonitor.wasConnected")
+        await MainActor.run {
+            UserDefaults.standard.removeObject(forKey: "AppState.isMonitoringEnabled")
+            UserDefaults.standard.removeObject(forKey: "ConnectivityMonitor.wasConnected")
+        }
         try await super.tearDown()
     }
 }

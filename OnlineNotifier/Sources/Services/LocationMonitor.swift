@@ -32,7 +32,6 @@ final class LocationMonitor: NSObject, LocationMonitoring {
         self.locationManager = CLLocationManager()
         super.init()
         locationManager.delegate = self
-        locationManager.allowsBackgroundLocationUpdates = true
         locationManager.pausesLocationUpdatesAutomatically = false
     }
 
@@ -47,6 +46,11 @@ final class LocationMonitor: NSObject, LocationMonitoring {
     func startMonitoring() {
         guard CLLocationManager.significantLocationChangeMonitoringAvailable() else {
             return
+        }
+        // Only enable background updates if the app is configured for it
+        // This will fail in test environments without proper Info.plist configuration
+        if Bundle.main.object(forInfoDictionaryKey: "UIBackgroundModes") != nil {
+            locationManager.allowsBackgroundLocationUpdates = true
         }
         locationManager.startMonitoringSignificantLocationChanges()
     }
