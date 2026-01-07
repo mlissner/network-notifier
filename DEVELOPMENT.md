@@ -11,30 +11,34 @@ This document covers how to build, test, and contribute to Online Notifier.
 ## Project Structure
 
 ```
-OnlineNotifier/
+.
+├── Package.swift                         # Swift Package Manager manifest
 ├── Sources/
 │   ├── App/
-│   │   ├── OnlineNotifierApp.swift    # Main entry point
-│   │   └── AppDelegate.swift          # Background task registration
+│   │   ├── OnlineNotifierApp.swift       # Main entry point
+│   │   └── AppDelegate.swift             # Background task registration
 │   ├── Views/
-│   │   └── ContentView.swift          # Main UI
+│   │   └── ContentView.swift             # Main UI
 │   ├── Services/
-│   │   ├── ConnectivityMonitor.swift  # Network monitoring (NWPathMonitor)
-│   │   ├── LocationMonitor.swift      # Background wake-ups (CLLocationManager)
-│   │   ├── NotificationService.swift  # Local notifications
-│   │   └── BackgroundTaskManager.swift # Periodic checks (BGTaskScheduler)
+│   │   ├── ConnectivityMonitor.swift     # Network monitoring (NWPathMonitor)
+│   │   ├── LocationMonitor.swift         # Background wake-ups (CLLocationManager)
+│   │   ├── NotificationService.swift     # Local notifications
+│   │   └── BackgroundTaskManager.swift   # Periodic checks (BGTaskScheduler)
 │   ├── Models/
-│   │   └── AppState.swift             # Central state coordinator
+│   │   └── AppState.swift                # Central state coordinator
 │   └── Resources/
-│       └── Localizable.xcstrings      # 20 language translations
+│       └── Localizable.xcstrings         # 20 language translations
 ├── Tests/
 │   ├── ConnectivityMonitorTests.swift
 │   ├── AppStateTests.swift
 │   └── NotificationServiceTests.swift
 ├── Config/
-│   └── Info.plist                     # Permission descriptions & background modes
-├── README.md                          # User documentation
-└── DEVELOPMENT.md                     # This file
+│   └── Info.plist                        # Permission descriptions & background modes
+├── .github/
+│   └── workflows/
+│       └── tests.yml                     # CI configuration
+├── README.md                             # User documentation
+└── DEVELOPMENT.md                        # This file
 ```
 
 ## Setting Up the Xcode Project
@@ -56,7 +60,7 @@ OnlineNotifier/
 ### Step 2: Copy Source Files
 
 1. In Xcode, delete the auto-generated `ContentView.swift` (move to trash)
-2. In Finder, navigate to the `OnlineNotifier/Sources` folder
+2. In Finder, navigate to the `Sources` folder in this repository
 3. Drag the following folders into Xcode's project navigator (under the `OnlineNotifier` group):
    - `App/`
    - `Views/`
@@ -109,6 +113,10 @@ OnlineNotifier/
 
 ## Running Tests
 
+### Continuous Integration
+
+Tests run automatically on GitHub Actions for every push and pull request to `main`. The CI uses macOS 14 with Xcode 15.4 and runs tests on an iPhone 15 simulator.
+
 ### From Xcode
 
 1. Add a test target: File → New → Target → Unit Testing Bundle
@@ -116,26 +124,23 @@ OnlineNotifier/
 3. Copy the test files from `Tests/` into the test target
 4. Run tests: Cmd+U or Product → Test
 
-### From Command Line
+### From Command Line (using Swift Package)
+
+The project includes a `Package.swift` that allows building and testing via xcodebuild:
 
 ```bash
-# Run tests using xcodebuild (requires Xcode project to be set up first)
-xcodebuild test \
-  -project OnlineNotifier.xcodeproj \
+# Build the package
+xcodebuild build \
   -scheme OnlineNotifier \
-  -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
-  -only-testing:OnlineNotifierTests
+  -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest'
+
+# Run tests
+xcodebuild test \
+  -scheme OnlineNotifier \
+  -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest'
 ```
 
-### Using Swift Package Manager (for logic tests only)
-
-The test files can also be run as a Swift package for unit tests that don't require iOS frameworks:
-
-```bash
-swift test
-```
-
-Note: Some tests require iOS simulator due to framework dependencies.
+Note: Tests require an iOS simulator because they depend on iOS frameworks (UserNotifications, CoreLocation, Network).
 
 ## Building for Device
 
@@ -186,6 +191,15 @@ The app uses three layers to detect connectivity restoration:
 - Coordinates all three monitors
 - Triggers notifications via `NotificationService`
 
+### Testability
+
+Services use protocol-based design for testability:
+
+- **NotificationCenterProtocol**: Abstracts `UNUserNotificationCenter` for testing notification logic without requiring system permissions
+- **LocationMonitoring**: Protocol for `LocationMonitor` to enable mocking in tests
+
+Tests use mock implementations to verify behavior without triggering actual system services (location, notifications).
+
 ### Localization
 
 All user-facing strings are in `Localizable.xcstrings` using Apple's String Catalog format. Supported languages:
@@ -216,7 +230,7 @@ All user-facing strings are in `Localizable.xcstrings` using Apple's String Cata
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Ensure tests pass
+4. Ensure tests pass (check CI status)
 5. Submit a pull request
 
 Please follow the existing code style and add tests for new functionality.
