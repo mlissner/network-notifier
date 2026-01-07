@@ -53,6 +53,7 @@ English, Chinese (Simplified), Chinese (Traditional), Spanish, Japanese, French,
 
 ## Privacy
 
+- **No internet access**: The app monitors your connection status but never actually uses the internet itself. It cannot send or receive any data.
 - **Location**: Used only to wake the app in background when you move to new network areas. Never stored or transmitted.
 - **No data collection**: Everything runs locally on your device.
 - **No backend**: No servers, no accounts, no tracking.
