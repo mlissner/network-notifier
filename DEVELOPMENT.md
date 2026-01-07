@@ -4,7 +4,7 @@ This document covers how to build, test, and contribute to Online Notifier.
 
 ## Prerequisites
 
-- Mac with Xcode 15 or later
+- Mac with Xcode 26 or later (Swift 6.2+)
 - Apple Developer account ($99/year) - required for device testing and distribution
 - iPhone running iOS 16.0 or later (for device testing)
 
@@ -115,7 +115,7 @@ This document covers how to build, test, and contribute to Online Notifier.
 
 ### Continuous Integration
 
-Tests run automatically on GitHub Actions for every push and pull request to `main`. The CI uses macOS 14 with Xcode 15.4 and runs tests on an iPhone 15 simulator.
+Tests run automatically on GitHub Actions for every push and pull request to `main`. The CI uses macOS 15 with Xcode 26 (Swift 6.2) and runs tests on an iPhone 15 simulator.
 
 ### From Xcode
 
@@ -209,7 +209,7 @@ All user-facing strings are in `Localizable.xcstrings` using Apple's String Cata
 
 ### Build Errors
 
-- Ensure Xcode 15+ is installed
+- Ensure Xcode 26+ is installed
 - Clean build folder: Cmd+Shift+K
 - Check all source files are added to the target
 
