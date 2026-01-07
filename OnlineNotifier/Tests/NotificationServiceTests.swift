@@ -12,15 +12,8 @@ final class MockNotificationCenter: NotificationCenterProtocol {
         return authorizationGranted
     }
 
-    func notificationSettings() async -> UNNotificationSettings {
-        // We can't create UNNotificationSettings directly, so we use a workaround
-        // by returning from a coder that sets the status we want
-        return await withCheckedContinuation { continuation in
-            let center = UNUserNotificationCenter.current()
-            center.getNotificationSettings { settings in
-                continuation.resume(returning: settings)
-            }
-        }
+    func getAuthorizationStatus() async -> UNAuthorizationStatus {
+        return authorizationStatus
     }
 
     func add(_ request: UNNotificationRequest) async throws {
@@ -31,6 +24,7 @@ final class MockNotificationCenter: NotificationCenterProtocol {
 /// Simpler mock that doesn't need real notification center access
 final class SimpleNotificationCenterMock: NotificationCenterProtocol {
     var authorizationGranted: Bool = false
+    var authorizationStatus: UNAuthorizationStatus = .notDetermined
     var addedRequests: [UNNotificationRequest] = []
     var shouldThrowOnAdd: Bool = false
 
@@ -38,10 +32,8 @@ final class SimpleNotificationCenterMock: NotificationCenterProtocol {
         return authorizationGranted
     }
 
-    func notificationSettings() async -> UNNotificationSettings {
-        // Return settings using archive trick - not possible to create directly
-        // So we skip actual settings checking in tests
-        fatalError("notificationSettings should not be called in tests that use SimpleNotificationCenterMock")
+    func getAuthorizationStatus() async -> UNAuthorizationStatus {
+        return authorizationStatus
     }
 
     func add(_ request: UNNotificationRequest) async throws {

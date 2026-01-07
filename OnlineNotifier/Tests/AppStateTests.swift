@@ -5,14 +5,14 @@ import UserNotifications
 /// Mock notification center for AppState tests
 private final class TestNotificationCenterMock: NotificationCenterProtocol {
     var authorizationGranted: Bool = true
+    var authorizationStatus: UNAuthorizationStatus = .authorized
 
     func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool {
         return authorizationGranted
     }
 
-    func notificationSettings() async -> UNNotificationSettings {
-        // This shouldn't be called in these tests, but we need a fallback
-        fatalError("notificationSettings not implemented in test mock")
+    func getAuthorizationStatus() async -> UNAuthorizationStatus {
+        return authorizationStatus
     }
 
     func add(_ request: UNNotificationRequest) async throws {

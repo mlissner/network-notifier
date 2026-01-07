@@ -11,12 +11,17 @@ protocol NotificationHandling: AnyObject {
 /// Protocol for notification center operations, enabling testability
 protocol NotificationCenterProtocol {
     func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool
-    func notificationSettings() async -> UNNotificationSettings
+    func getAuthorizationStatus() async -> UNAuthorizationStatus
     func add(_ request: UNNotificationRequest) async throws
 }
 
 /// Make UNUserNotificationCenter conform to our protocol
-extension UNUserNotificationCenter: NotificationCenterProtocol {}
+extension UNUserNotificationCenter: NotificationCenterProtocol {
+    func getAuthorizationStatus() async -> UNAuthorizationStatus {
+        let settings = await notificationSettings()
+        return settings.authorizationStatus
+    }
+}
 
 /// Handles local notification requests and delivery.
 final class NotificationService: NotificationHandling {
@@ -48,8 +53,7 @@ final class NotificationService: NotificationHandling {
 
     /// Checks current notification authorization status
     func checkAuthorizationStatus() async -> UNAuthorizationStatus {
-        let settings = await notificationCenter.notificationSettings()
-        return settings.authorizationStatus
+        return await notificationCenter.getAuthorizationStatus()
     }
 
     /// Sends a local notification informing the user that connectivity has been restored
