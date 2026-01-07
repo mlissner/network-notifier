@@ -25,7 +25,6 @@ jobs:
         run: xcrun simctl list devices available | grep -E "iPhone (14|15)" | head -10
 
       - name: Build Package
-        working-directory: OnlineNotifier
         run: |
           xcodebuild build \
             -scheme OnlineNotifier \
@@ -33,7 +32,6 @@ jobs:
             -skipPackagePluginValidation
 
       - name: Run Tests
-        working-directory: OnlineNotifier
         run: |
           xcodebuild test \
             -scheme OnlineNotifier \
