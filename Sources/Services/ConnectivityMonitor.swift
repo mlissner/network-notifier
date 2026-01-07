@@ -12,7 +12,8 @@ protocol ConnectivityMonitoring: AnyObject {
 
 /// Monitors network connectivity using NWPathMonitor.
 /// Detects transitions from offline to online and triggers callbacks.
-final class ConnectivityMonitor: ConnectivityMonitoring {
+/// Note: @unchecked Sendable because we handle thread safety via DispatchQueue.
+final class ConnectivityMonitor: ConnectivityMonitoring, @unchecked Sendable {
 
     // MARK: - Properties
 
