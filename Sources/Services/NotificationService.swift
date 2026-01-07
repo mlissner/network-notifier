@@ -9,7 +9,7 @@ protocol NotificationHandling: AnyObject {
 }
 
 /// Protocol for notification center operations, enabling testability
-protocol NotificationCenterProtocol {
+protocol NotificationCenterProtocol: Sendable {
     func requestAuthorization(options: UNAuthorizationOptions) async throws -> Bool
     func getAuthorizationStatus() async -> UNAuthorizationStatus
     func add(_ request: UNNotificationRequest) async throws
@@ -24,7 +24,8 @@ extension UNUserNotificationCenter: NotificationCenterProtocol {
 }
 
 /// Handles local notification requests and delivery.
-final class NotificationService: NotificationHandling {
+/// Note: @unchecked Sendable because notificationCenter is thread-safe.
+final class NotificationService: NotificationHandling, @unchecked Sendable {
 
     // MARK: - Properties
 

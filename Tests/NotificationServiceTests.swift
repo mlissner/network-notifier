@@ -3,7 +3,7 @@ import UserNotifications
 @testable import OnlineNotifier
 
 /// Mock notification center for testing
-final class MockNotificationCenter: NotificationCenterProtocol {
+final class MockNotificationCenter: NotificationCenterProtocol, @unchecked Sendable {
     var authorizationStatus: UNAuthorizationStatus = .notDetermined
     var authorizationGranted: Bool = false
     var addedRequests: [UNNotificationRequest] = []
@@ -22,7 +22,7 @@ final class MockNotificationCenter: NotificationCenterProtocol {
 }
 
 /// Simpler mock that doesn't need real notification center access
-final class SimpleNotificationCenterMock: NotificationCenterProtocol {
+final class SimpleNotificationCenterMock: NotificationCenterProtocol, @unchecked Sendable {
     var authorizationGranted: Bool = false
     var authorizationStatus: UNAuthorizationStatus = .notDetermined
     var addedRequests: [UNNotificationRequest] = []

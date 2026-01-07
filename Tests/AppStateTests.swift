@@ -3,7 +3,7 @@ import UserNotifications
 @testable import OnlineNotifier
 
 /// Mock notification center for AppState tests
-private final class TestNotificationCenterMock: NotificationCenterProtocol {
+private final class TestNotificationCenterMock: NotificationCenterProtocol, @unchecked Sendable {
     var authorizationGranted: Bool = true
     var authorizationStatus: UNAuthorizationStatus = .authorized
 
