@@ -115,7 +115,7 @@ This document covers how to build, test, and contribute to Online Notifier.
 
 ### Continuous Integration
 
-Tests run automatically on GitHub Actions for every push and pull request to `main`. The CI uses macOS 15 with Xcode 26 (Swift 6.2) and runs tests on an iPhone 15 simulator.
+Tests run automatically on GitHub Actions for every push and pull request to `main`. The CI uses macOS 15 with Xcode 26 (Swift 6.2) and runs tests on an iPhone 16 simulator.
 
 ### From Xcode
 

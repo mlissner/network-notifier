@@ -22,18 +22,18 @@ jobs:
         run: xcodebuild -version
 
       - name: List available simulators
-        run: xcrun simctl list devices available | grep -E "iPhone (14|15)" | head -10
+        run: xcrun simctl list devices available | grep -E "iPhone 16" | head -10
 
       - name: Build Package
         run: |
           xcodebuild build \
             -scheme OnlineNotifier \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -skipPackagePluginValidation
 
       - name: Run Tests
         run: |
           xcodebuild test \
             -scheme OnlineNotifier \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -skipPackagePluginValidation
