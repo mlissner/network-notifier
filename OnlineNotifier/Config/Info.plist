@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Background Modes -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>fetch</string>
+        <string>processing</string>
+    </array>
+
+    <!-- Background Task Identifier -->
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>com.onlinenotifier.connectivity-check</string>
+    </array>
+
+    <!-- Location Usage Descriptions -->
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>To notify you when you regain internet connection, we monitor location changes which correlate with network changes. Your location is never stored or shared.</string>
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>To notify you when you regain internet connection, we monitor location changes which correlate with network changes. Your location is never stored or shared.</string>
+
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>To notify you when you regain internet connection, we monitor location changes which correlate with network changes. Your location is never stored or shared.</string>
+</dict>
+</plist>
